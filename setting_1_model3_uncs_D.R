@@ -187,7 +187,12 @@ mean(RH_square_2_txt$V1)
 median(RH_square_2_txt$V1)
 quantile(RH_square_2_txt$V1)
 
+margin<- qt(0.95,df=length(RH_square_2_txt$V1)-1)*sd(RH_square_2_txt$V1)/sqrt(length(RH_square_2_txt$V1))
+lowerinterval <- mean(RH_square_2_txt$V1) - margin
+upperinterval <- mean(RH_square_2_txt$V1) + margin
 
+
+hist( as.numeric(RH_square_2_txt$V1), main="", xlab=bquote("R"[Lambda]^2),breaks = 8, ylim=c(0,4000000), xlim=c(0,1))
 hist( as.numeric(RH_square_2_txt$V1), main="", xlab=bquote("R"[Lambda]^2),   labels = TRUE,breaks = 15, ylim=c(0,4100000))
 grid()
 box()

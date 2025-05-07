@@ -23,22 +23,13 @@ Sigma<- matrix(c( var_placebo[1,1], NA, var_placebo[2,1],NA,
                   NA, var_exp[1,2], NA, var_exp[2,2]), nrow=4, ncol=4)
 
 ##estimable corr
-corr<- matrix(c( 1, NA, (var_placebo[2,1]/sqrt(var_placebo[1,1]*var_placebo[2,2])),NA,
-                 NA, 1, NA, var_exp[2,1]/(sqrt(var_exp[1,1])*sqrt(var_exp[2,2])),
-                 (var_placebo[2,1]/sqrt(var_placebo[1,1]*var_placebo[2,2])), NA, 1, NA,
-                 NA,  var_exp[2,1]/(sqrt(var_exp[1,1])*sqrt(var_exp[2,2])), NA, 1), nrow=4, ncol=4)
-
+corr<- cov2cor(Sigma)
 D_matrix<- matrix(c( d_placebo[1,1], NA, d_placebo[2,1],NA,
                      NA, d_exp[1,1], NA, d_exp[1,2],
                      d_placebo[1,2], NA, d_placebo[2,2], NA,
                      NA, d_exp[1,2], NA, d_exp[2,2]), nrow=4, ncol=4)
 
-d_corr<- matrix(c( 1, NA, (d_placebo[2,1]/sqrt(d_placebo[1,1]*d_placebo[2,2])),NA,
-                 NA, 1, NA, d_exp[2,1]/(sqrt(d_exp[1,1])*sqrt(d_exp[2,2])),
-                 (d_placebo[2,1]/sqrt(d_placebo[1,1]*d_placebo[2,2])), NA, 1, NA,
-                 NA,  d_exp[2,1]/(sqrt(d_exp[1,1])*sqrt(d_exp[2,2])), NA, 1), nrow=4, ncol=4)
-
-
+d_corr<- cov2cor(D_matrix)
 
 ICA_1<- ICA.ContCont(T0S0=corr[1,3], T1S1=corr[2,4], T0T0=Sigma[1,1], T1T1=Sigma[2,2], S0S0=Sigma[3,3], S1S1=Sigma[4,4], T0T1=seq(-1, 1, by=.1), 
                    T0S1=seq(-1, 1, by=.1), T1S0=seq(-1, 1, by=.1), S0S1=seq(-1, 1, by=.1))
@@ -53,6 +44,7 @@ ICA_2<- ICA.ContCont(T0S0=d_corr[1,3], T1S1=d_corr[2,4], T0T0=D_matrix[1,1], T1T
 
 pos_def_2<-ICA_2$Pos.Def
 rho_delta_2<- ICA_2$ICA
+
 
 
 ##add for loop
@@ -155,10 +147,53 @@ grid()
 box()
 write.csv(RH_square_2,"~/Downloads/RH_square_2_fin1_random.csv", row.names = FALSE)
 
+RH_square_2<- read.csv("/Users/gokcedeliorman/Downloads/rh2_square_fin1_26march.txt")
+
+summary(RH_square_2$X0.9999974)
+hist( as.numeric(RH_square_2$X0.9999974), main="", xlab=bquote("R"[H]^2),  breaks = 8, labels = TRUE, xlim=c(0,1), ylim=c(0,1999999))
+hist( as.numeric(RH_square_2$X0.9999974), main="", xlab=bquote("R"[Lambda]^2),  breaks = 15, xlim=c(0,1), ylim=c(0,1999999))
+grid()
+box()
+quantile(RH_square_2$X0.9999974)
+margin<- qt(0.95,df=length(RH_square_2$X0.9999974)-1)*sd(RH_square_2$X0.9999974)/sqrt(length(RH_square_2$X0.9999974))
+lowerinterval <- mean(RH_square_2$X0.9999974) - margin
+upperinterval <- mean(RH_square_2$X0.9999974) + margin
+
+
+##for 3 trials bprs
+#RH_square_2<- read.csv("/Users/gokcedeliorman/Downloads/RH_square_setting3_model2.txt")
+RH_square_2<- read.csv("/Users/gokcedeliorman/Downloads/RH_square_check_setting3_model2.txt")
+summary(RH_square_2$X1)
+hist( as.numeric(RH_square_2$X1), main="", xlab=bquote("R"[Lambda]^2),  breaks = 8, labels = TRUE, xlim=c(0,1), ylim=c(0,1200000))
+hist( as.numeric(RH_square_2$X1), main="", xlab=bquote("R"[Lambda]^2),  breaks = 15, xlim=c(0,1), ylim=c(0,1190000))
+grid()
+
+box()
+quantile(RH_square_2$X1)
+mean(RH_square_2$X1)
+margin<- qt(0.95,df=length(RH_square_2$X1)-1)*sd(RH_square_2$X1)/sqrt(length(RH_square_2$X1))
+lowerinterval <- mean(RH_square_2$X1) - margin
+upperinterval <- mean(RH_square_2$X1) + margin
+
 
 ##change the code with text to take less time
 
 ##double check the formula and theory
+##for i 1 
+corr[1,2]<- corr[2,1]<- corr[4,1]<- corr[1,4]<- corr[2,3]<- corr[3,2] <- corr[4,3] <- corr[3,4]<- -0.9
+Sigma[1,2]<- Sigma[2,1] <- sqrt(Sigma[1,1]*Sigma[2,2])*-0.9
+Sigma[1,4]<- Sigma[4,1] <- sqrt(Sigma[1,1]*Sigma[4,4])*-0.9
+Sigma[2,3]<- Sigma[3,2] <- sqrt(Sigma[2,2]*Sigma[3,3])*-0.9
+Sigma[4,3]<- Sigma[3,4] <- sqrt(Sigma[4,4]*Sigma[3,3])*-0.9
+
+
+d_corr[1,2]<- d_corr[2,1]<- d_corr[4,1]<- d_corr[1,4]<- d_corr[2,3]<- d_corr[3,2] <- d_corr[4,3] <- d_corr[3,4]<- -0.9
+D_matrix[1,2]<- D_matrix[2,1] <- sqrt(D_matrix[1,1]*D_matrix[2,2])*-0.9
+D_matrix[1,4]<- D_matrix[4,1] <- sqrt(D_matrix[1,1]*D_matrix[4,4])*-0.9
+D_matrix[2,3]<- D_matrix[3,2] <- sqrt(D_matrix[2,2]*D_matrix[3,3])*-0.9
+D_matrix[4,3]<- D_matrix[3,4] <- sqrt(D_matrix[4,4]*D_matrix[3,3])*-0.9
+
+
 ar1_cor <- function(n, rho) {
   exponent <- abs(matrix(1:n - 1, nrow = n, ncol = n, byrow = TRUE) - 
                     (1:n - 1))
